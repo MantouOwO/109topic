@@ -73,29 +73,49 @@ def register():
     return jsonify(info)
 
 
-# logout
+# logout  #修改須確認
 @app.route('/logout', methods=["POST"])
 def logout():
     data = json.loads(request.get_data())
+    access_token = data['access_token']
+    now_time = int(time.time())
+    #conn.execute(
+    #    "SELECT IF((SELECT 1 FROM token where access_token= '" +
+    #    access_token + "'AND time_limit >'" + str(now_time) + "'AND status='login'), 1, 0)"
+    #)
+    result_set = conn.fetchone()
+    #info = dict()
+    if result_set[0] == 1:
+        conn.execute(
+            "UPDATE token SET status='logout' WHERE access_token='" + access_token + "'"
+        )
+        mydb.commit()
+
+    return 
+
+# changePasswd
+@app.route('/changePasswd' , methods=["POST"])
+def changePasswd():
+    data = data = json.loads(request.get_data())
     ID = data['ID']
+    newPasswd = data['newPasswd']
     access_token = data['access_token']
     now_time = int(time.time())
     conn.execute(
-        "SELECT IF((SELECT 1 FROM token where BINARY ID= '" + ID + "' AND access_token= '" +
+        "SELECT IF((SELECT 1 FROM token where access_token= '" +
         access_token + "'AND time_limit >'" + str(now_time) + "'AND status='login'), 1, 0)"
     )
     result_set = conn.fetchone()
     info = dict()
     if result_set[0] == 1:
         conn.execute(
-            "UPDATE token SET status='logout' WHERE access_token='" + access_token + "'"
+            "UPDATE account SET passwd = '" + newPasswd + "'WHERE ID='" + ID + "'"
         )
         mydb.commit()
-        info['result'] = "logout success"
+        info['result'] = "change password success"
     else:
-        info['result'] = "Logged out"
+        info['result'] = "change password fail"
 
     return jsonify(info)
-
 
 app.run('127.0.0.1', port=5000)
