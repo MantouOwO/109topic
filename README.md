@@ -11,19 +11,19 @@ https://www.apachefriends.org/zh_tw/index.html
 server功能(POST JSON) 
 
 /login
-request {'ID' : ID , 'passwd' : passwd}
+request {'ID' : ID , 'passwd' : passwd}  
 return info{'result' : "1" , 'access_token' : token}
 
 /logout
-request {'access_token' : access_token}
+request {'access_token' : access_token}  
 return 0
 
 /register
-request {'ID' : ID , 'passwd' : passwd}
+request {'ID' : ID , 'passwd' : passwd}  
 return info{'result' : "ID already exists"} or info{'result' : "register success"}
 
 /changePasswd
-request {'ID' : ID , 'passwd' : passwd , 'access_token' : access_token}
+request {'ID' : ID , 'passwd' : passwd , 'access_token' : access_token}  
 return info{'result' : "change password success"} or info{'result' : "change password fail"}
 
 /downloadSaveData
