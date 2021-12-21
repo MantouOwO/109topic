@@ -26,13 +26,6 @@ return info{'result' : "ID already exists"} or info{'result' : "register success
 request {'ID' : ID , 'passwd' : passwd , 'access_token' : access_token}
 return info{'result' : "change password success"} or info{'result' : "change password fail"}
 
-/downloadSaveData
-
-
-/uploadSaveData
-
-
-/showSaveData
 
 ----------------------------------------------------------
 mysql table
