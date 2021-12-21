@@ -3,7 +3,8 @@ import myToken
 import mysql.connector
 import json
 import time
-import os
+import hashlib
+
 
 mydb = mysql.connector.connect(
     host="127.0.0.1",
@@ -23,22 +24,31 @@ def login():
     data = json.loads(request.get_data())
     ID = data['ID']
     passwd = data['passwd']
+
+    passwd_md5 = hashlib.md5() #密碼雜湊
+    passwd_md5.update(passwd.encode("utf-8"))
+
     conn.execute(
         "SELECT IF((SELECT 1 FROM account where BINARY ID='" + ID +
-        "' AND BINARY passwd='" + passwd + "') ,1,0)"
+        "' AND BINARY passwd='" + passwd_md5.hexdigest() + "') ,1,0)"
     )
     result_set = conn.fetchone()  # mysql return 1 or 0
+
     info = dict()
     if result_set[0] == 1:
-        access_token = myToken.creat_jwt(ID)
+        access_token = myToken.creat_jwt(ID) #生成token
+        access_token_md5 = hashlib.md5() #token雜湊
+        access_token_md5.update(access_token.encode("utf-8"))
+
         logining_time = time.asctime(
             time.localtime(time.time()))  # logining time
         time_limit = int(time.time()) + 3600  # token time limit 1hr
+        
         conn.execute(
             "UPDATE token SET status='Login elsewhere' WHERE ID='" + ID + "'"
         )
         conn.execute(
-            "INSERT INTO token values ('" + ID + "','" + access_token +
+            "INSERT INTO token values ('" + ID + "','" + access_token_md5.hexdigest() +
             "','" + logining_time + "','" + str(time_limit) + "','login')"
         )
         mydb.commit()

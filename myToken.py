@@ -1,8 +1,7 @@
 import time
 import base64
 import hmac
-import hashlib 
-import binascii
+
 
 #參考資料:https://medium.com/mr-efacani-teatime/%E6%B7%BA%E8%AB%87jwt%E7%9A%84%E5%AE%89%E5%85%A8%E6%80%A7%E8%88%87%E9%81%A9%E7%94%A8%E6%83%85%E5%A2%83-301b5491b60e
 secret_key = 'mantou'
