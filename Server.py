@@ -54,6 +54,8 @@ def login():
         mydb.commit()
         info['access_token'] = access_token
         info['result'] = "1"
+    else:
+        info['result'] = "0"
 
     return jsonify(info)  # login success return token
 
@@ -64,6 +66,8 @@ def register():
     data = json.loads(request.get_data())
     ID = data['ID']
     passwd = data['passwd']
+    passwd_md5 = hashlib.md5() #密碼雜湊
+    passwd_md5.update(passwd.encode("utf-8"))
     conn.execute(
         "SELECT IF((SELECT 1 FROM account where BINARY ID='" + ID + "'), 1, 0)"
     )
@@ -75,7 +79,7 @@ def register():
         passwd = data['passwd']
         conn.execute(
             "INSERT INTO account values ('" + ID +
-            "','" + passwd + "')"
+            "','" + passwd_md5.hexdigest() + "')"
         )
         mydb.commit()
         info['result'] = "register success"
@@ -128,4 +132,4 @@ def changePasswd():
 
     return jsonify(info)
 
-app.run('127.0.0.1', port=5000)
+app.run('192.168.0.101', port=5000)
