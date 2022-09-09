@@ -19,13 +19,16 @@ app = Flask(__name__)
 app.config["DEBUG"] = True
 
 # login
+
+
 @app.route('/login', methods=['POST'])
 def login():
+    print(request.get_data())
     data = json.loads(request.get_data())
     ID = data['ID']
     passwd = data['passwd']
 
-    passwd_md5 = hashlib.md5() #密碼雜湊
+    passwd_md5 = hashlib.md5()  # 密碼雜湊
     passwd_md5.update(passwd.encode("utf-8"))
 
     conn.execute(
@@ -36,14 +39,14 @@ def login():
 
     info = dict()
     if result_set[0] == 1:
-        access_token = myToken.creat_jwt(ID) #生成token
-        access_token_md5 = hashlib.md5() #token雜湊
+        access_token = myToken.creat_jwt(ID)  # 生成token
+        access_token_md5 = hashlib.md5()  # token雜湊
         access_token_md5.update(access_token.encode("utf-8"))
 
         logining_time = time.asctime(
             time.localtime(time.time()))  # logining time
         time_limit = int(time.time()) + 3600  # token time limit 1hr
-        
+
         conn.execute(
             "UPDATE token SET status='Login elsewhere' WHERE ID='" + ID + "'"
         )
@@ -66,7 +69,7 @@ def register():
     data = json.loads(request.get_data())
     ID = data['ID']
     passwd = data['passwd']
-    passwd_md5 = hashlib.md5() #密碼雜湊
+    passwd_md5 = hashlib.md5()  # 密碼雜湊
     passwd_md5.update(passwd.encode("utf-8"))
     conn.execute(
         "SELECT IF((SELECT 1 FROM account where BINARY ID='" + ID + "'), 1, 0)"
@@ -93,10 +96,10 @@ def logout():
     data = json.loads(request.get_data())
     access_token = data['access_token']
     now_time = int(time.time())
-    #conn.execute(
+    # conn.execute(
     #    "SELECT IF((SELECT 1 FROM token where access_token= '" +
     #    access_token + "'AND time_limit >'" + str(now_time) + "'AND status='login'), 1, 0)"
-    #)
+    # )
     result_set = conn.fetchone()
     #info = dict()
     if result_set[0] == 1:
@@ -105,19 +108,22 @@ def logout():
         )
         mydb.commit()
 
-    return 
+    return
 
 # changePasswd
-@app.route('/changePasswd' , methods=["POST"])
+
+
+@app.route('/changePasswd', methods=["POST"])
 def changePasswd():
-    data = data = json.loads(request.get_data())
+    data = json.loads(request.get_data())
     ID = data['ID']
     newPasswd = data['newPasswd']
     access_token = data['access_token']
     now_time = int(time.time())
     conn.execute(
         "SELECT IF((SELECT 1 FROM token where access_token= '" +
-        access_token + "'AND time_limit >'" + str(now_time) + "'AND status='login'), 1, 0)"
+        access_token + "'AND time_limit >'" +
+        str(now_time) + "'AND status='login'), 1, 0)"
     )
     result_set = conn.fetchone()
     info = dict()
@@ -132,4 +138,5 @@ def changePasswd():
 
     return jsonify(info)
 
-app.run('192.168.0.101', port=5000)
+
+app.run('127.0.0.1', port=5000)
