@@ -1,8 +1,7 @@
 環境
 
 Python 3.9.2
-pip install flask
-pip install mysql-connector
+pip install flaskmysql-connector
 
 xampp
 https://www.apachefriends.org/zh_tw/index.html
