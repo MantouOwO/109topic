@@ -119,10 +119,12 @@ def changePasswd():
     ID = data['ID']
     newPasswd = data['newPasswd']
     access_token = data['access_token']
+    access_token_md5 = hashlib.md5()  # token雜湊
+    access_token_md5.update(access_token.encode("utf-8"))
     now_time = int(time.time())
     conn.execute(
         "SELECT IF((SELECT 1 FROM token where access_token= '" +
-        access_token + "'AND time_limit >'" +
+        access_token_md5.hexdigest() + "'AND time_limit >'" +
         str(now_time) + "'AND status='login'), 1, 0)"
     )
     result_set = conn.fetchone()
