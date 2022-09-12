@@ -23,7 +23,7 @@ app.config["DEBUG"] = True
 
 @app.route('/login', methods=['POST'])
 def login():
-    print(request.get_data())
+    
     data = json.loads(request.get_data())
     ID = data['ID']
     passwd = data['passwd']
@@ -96,10 +96,10 @@ def logout():
     data = json.loads(request.get_data())
     access_token = data['access_token']
     now_time = int(time.time())
-    # conn.execute(
-    #    "SELECT IF((SELECT 1 FROM token where access_token= '" +
-    #    access_token + "'AND time_limit >'" + str(now_time) + "'AND status='login'), 1, 0)"
-    # )
+    conn.execute(
+       "SELECT IF((SELECT 1 FROM token where access_token= '" +
+       access_token + "'AND time_limit >'" + str(now_time) + "'AND status='login'), 1, 0)"
+     )
     result_set = conn.fetchone()
     #info = dict()
     if result_set[0] == 1:
@@ -111,16 +111,18 @@ def logout():
     return
 
 # changePasswd
-
-
 @app.route('/changePasswd', methods=["POST"])
 def changePasswd():
     data = json.loads(request.get_data())
     ID = data['ID']
     newPasswd = data['newPasswd']
+    newPasswd_md5 = hashlib.md5()
+    newPasswd_md5.update(newPasswd.encode("utf-8"))
+
     access_token = data['access_token']
     access_token_md5 = hashlib.md5()  # token雜湊
     access_token_md5.update(access_token.encode("utf-8"))
+
     now_time = int(time.time())
     conn.execute(
         "SELECT IF((SELECT 1 FROM token where access_token= '" +
@@ -131,7 +133,7 @@ def changePasswd():
     info = dict()
     if result_set[0] == 1:
         conn.execute(
-            "UPDATE account SET passwd = '" + newPasswd + "'WHERE ID='" + ID + "'"
+            "UPDATE account SET passwd = '" + newPasswd_md5.hexdigest() + "'WHERE ID='" + ID + "'"
         )
         mydb.commit()
         info['result'] = "change password success"
